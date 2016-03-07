@@ -1,0 +1,19 @@
+{
+  "name": "pagedata-api",
+  "version": "0.0.1",
+  "description": "An API module for gathering page data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/firstandthird/pagedata-api.git"
+  },
+  "author": "First & Third",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/firstandthird/pagedata-api/issues"
+  },
+  "homepage": "https://github.com/firstandthird/pagedata-api#readme"
+}
