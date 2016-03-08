@@ -29,7 +29,11 @@ class PageData {
         return cb(err);
       }
       if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
+        return cb({
+          message: 'Api returned a non 200 status code',
+          statusCode: res.statusCode,
+          result: res
+        });
       }
       return cb(null, payload);
     });
@@ -62,7 +66,11 @@ class PageData {
         return cb(err);
       }
       if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
+        return cb({
+          message: 'Api returned a non 200 status code',
+          statusCode: res.statusCode,
+          result: res
+        });
       }
 
       cb(null, responsePayload);
