@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/firstandthird/pagedata-api/issues"
   },
-  "homepage": "https://github.com/firstandthird/pagedata-api#readme"
+  "homepage": "https://github.com/firstandthird/pagedata-api#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "wreck": "^7.0.2"
+  }
 }
