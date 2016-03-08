@@ -19,5 +19,11 @@
   "dependencies": {
     "async": "^1.5.2",
     "wreck": "^7.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^2.3.0",
+    "eslint-config-airbnb": "^6.1.0",
+    "eslint-config-firstandthird": "^1.6.0",
+    "eslint-plugin-react": "^4.2.0"
   }
 }
