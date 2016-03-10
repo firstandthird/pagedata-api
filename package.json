@@ -18,12 +18,15 @@
   "homepage": "https://github.com/firstandthird/pagedata-api#readme",
   "dependencies": {
     "async": "^1.5.2",
-    "wreck": "^7.0.2"
+    "wreck": "^6.3.0"
   },
   "devDependencies": {
+    "code": "^2.1.0",
     "eslint": "^2.3.0",
     "eslint-config-airbnb": "^6.1.0",
     "eslint-config-firstandthird": "^1.6.0",
-    "eslint-plugin-react": "^4.2.0"
+    "eslint-plugin-react": "^4.2.0",
+    "lab": "^10.2.0",
+    "sinon": "^1.17.3"
   }
 }

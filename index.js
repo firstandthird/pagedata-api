@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; //eslint-disable-line strict
 
 const wreck = require('wreck');
 const async = require('async');
@@ -18,6 +18,10 @@ class PageData {
   }
 
   get(slug, cb) {
+    if (!slug) {
+      cb('You must provide a proper slug');
+    }
+
     const url = this.getUrl(slug);
     wreck.get(url, {
       json: true,
@@ -29,7 +33,11 @@ class PageData {
         return cb(err);
       }
       if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
+        return cb({
+          message: 'Api returned a non 200 status code',
+          statusCode: res.statusCode,
+          result: res
+        });
       }
       return cb(null, payload);
     });
@@ -62,7 +70,11 @@ class PageData {
         return cb(err);
       }
       if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
+        return cb({
+          message: 'Api returned a non 200 status code',
+          statusCode: res.statusCode,
+          result: res
+        });
       }
 
       cb(null, responsePayload);
