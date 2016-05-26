@@ -31,6 +31,13 @@ class PageData {
       if (res.statusCode !== 200) {
         return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
       }
+      if (typeof payload.content === 'string') {
+        try {
+          payload.content = JSON.parse(payload.content);
+        } catch (e) {
+          return cb(e);
+        }
+      }
       return cb(null, payload);
     });
   }
