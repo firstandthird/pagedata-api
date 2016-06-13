@@ -2,6 +2,7 @@
 
 const wreck = require('wreck');
 const async = require('async');
+const defaults = require('lodash.defaultsdeep');
 
 class PageData {
   constructor(url, env, key) {
@@ -46,6 +47,20 @@ class PageData {
     async.map(slugs, (slug, done) => {
       this.get(slug, done);
     }, cb);
+  }
+
+  getManyAndMerge(slugs, cb) {
+    async.map(slugs, (slug, done) => {
+      this.get(slug, done);
+    }, (err, data) => {
+      if (err) {
+        return cb(err);
+      }
+      const content = data.map(item => item.content);
+      content.unshift({});
+      const merged = defaults.apply(null, content);
+      cb(null, merged);
+    });
   }
 
   update(slug, content, cb) {
