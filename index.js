@@ -5,17 +5,16 @@ const async = require('async');
 const defaults = require('lodash.defaultsdeep');
 
 class PageData {
-  constructor(url, env, key) {
+  constructor(url, key, tag) {
     this.options = {
       url,
-      env,
+      tag,
       key
     };
-    return this;
   }
 
   getUrl(slug) {
-    return `${this.options.url}/${this.options.env}/api/page/${slug}`;
+    return `${this.options.url}/api/page/${slug}?tag=${this.options.tag}`;
   }
 
   get(slug, cb) {
