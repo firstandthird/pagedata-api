@@ -5,20 +5,23 @@ const async = require('async');
 const defaults = require('lodash.defaultsdeep');
 
 class PageData {
-  constructor(url, key, tag) {
+  constructor(url, key) {
     this.options = {
       url,
-      key,
-      tag: tag || ''
+      key
     };
   }
 
-  getUrl(slug) {
-    return `${this.options.url}/api/page/${slug}?tag=${this.options.tag}`;
+  getUrl(slug, tag) {
+    return `${this.options.url}/api/page/${slug}?tag=${tag}`;
   }
 
-  get(slug, cb) {
-    const url = this.getUrl(slug);
+  get(slug, tag, cb) {
+    if (typeof tag === 'function') {
+      cb = tag;
+      tag = '';
+    }
+    const url = this.getUrl(slug, tag);
     wreck.get(url, {
       json: true,
       headers: {
@@ -42,15 +45,15 @@ class PageData {
     });
   }
 
-  getMany(slugs, cb) {
+  getMany(slugs, tag, cb) {
     async.map(slugs, (slug, done) => {
-      this.get(slug, done);
+      this.get(slug, tag, done);
     }, cb);
   }
 
-  getManyAndMerge(slugs, cb) {
+  getManyAndMerge(slugs, tag, cb) {
     async.map(slugs, (slug, done) => {
-      this.get(slug, done);
+      this.get(slug, tag, done);
     }, (err, data) => {
       if (err) {
         return cb(err);
