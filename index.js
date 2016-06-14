@@ -8,8 +8,8 @@ class PageData {
   constructor(url, key, tag) {
     this.options = {
       url,
-      tag,
-      key
+      key,
+      tag: tag || ''
     };
   }
 
