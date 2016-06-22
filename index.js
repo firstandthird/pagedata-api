@@ -31,8 +31,11 @@ class PageData {
       if (err) {
         return cb(err);
       }
+      if (res.statusCode === 404) {
+        return cb(new Error('Invalid slug and/or tag'));
+      }
       if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
+        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
       }
       if (typeof payload.content === 'string') {
         try {
