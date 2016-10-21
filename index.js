@@ -12,16 +12,31 @@ class PageData {
     };
   }
 
-  getUrl(slug, tag) {
-    return `${this.options.url}/api/page/${slug}?tag=${tag}`;
+  getPages(site, done) {
+    const url = `${this.options.url}/api/sites/${site}/pages`;
+    wreck.get(url, {
+      json: true,
+      headers: {
+        'x-api-key': this.options.key
+      }
+    }, (err, res, payload) => {
+      if (err) {
+        return done(err);
+      }
+      done(null, payload);
+    });
   }
 
-  get(slug, tag, cb) {
+  getUrl(site, slug, tag) {
+    return `${this.options.url}/api/sites/${site}/pages/${slug}?tag=${tag}`;
+  }
+
+  get(site, slug, tag, cb) {
     if (typeof tag === 'function') {
       cb = tag;
       tag = '';
     }
-    const url = this.getUrl(slug, tag);
+    const url = this.getUrl(site, slug, tag);
     wreck.get(url, {
       json: true,
       headers: {
@@ -48,15 +63,15 @@ class PageData {
     });
   }
 
-  getMany(slugs, tag, cb) {
+  getMany(site, slugs, tag, cb) {
     async.map(slugs, (slug, done) => {
-      this.get(slug, tag, done);
+      this.get(site, slug, tag, done);
     }, cb);
   }
 
-  getManyAndMerge(slugs, tag, cb) {
+  getManyAndMerge(site, slugs, tag, cb) {
     async.map(slugs, (slug, done) => {
-      this.get(slug, tag, done);
+      this.get(site, slug, tag, done);
     }, (err, data) => {
       if (err) {
         return cb(err);
