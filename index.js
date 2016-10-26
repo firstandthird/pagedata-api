@@ -5,13 +5,15 @@ const async = require('async');
 const defaults = require('lodash.defaultsdeep');
 
 class PageData {
-  constructor(url, key) {
+  constructor(url, key, userAgent) {
     this.options = {
       url,
       key
     };
+    if (userAgent) {
+      this.options.userAgent = userAgent;
+    }
   }
-
   getPages(site, done) {
     const url = `${this.options.url}/api/sites/${site}/pages`;
     wreck.get(url, {
