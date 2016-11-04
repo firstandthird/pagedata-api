@@ -94,34 +94,6 @@ class PageData {
     });
   }
 
-  update(slug, content, cb) {
-    const url = this.getUrl(slug);
-    const headers = {
-      'x-api-key': this.options.key
-    };
-    if (this.options.userAgent) {
-      headers['user-agent'] = this.options.userAgent;
-    }
-
-    if (!content.content) {
-      return cb({ message: 'Payload must include content attirbute' });
-    }
-    const payload = JSON.stringify(content);
-    wreck.put(url, {
-      json: true,
-      headers,
-      payload
-    }, (err, res, responsePayload) => {
-      if (err) {
-        return cb(err);
-      }
-      if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
-      }
-
-      cb(null, responsePayload);
-    });
-  }
 }
 
 module.exports = PageData;

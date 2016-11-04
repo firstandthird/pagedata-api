@@ -28,7 +28,6 @@ lab.experiment('hapi-auth-email hashing', () => {
     code.expect(typeof pageData.get).to.equal('function');
     code.expect(typeof pageData.getMany).to.equal('function');
     code.expect(typeof pageData.getManyAndMerge).to.equal('function');
-    code.expect(typeof pageData.update).to.equal('function');
     code.expect(pageData.options.url).to.equal(url);
     code.expect(pageData.options.key).to.equal(key);
     code.expect(pageData.options.userAgent).to.equal(userAgent);
@@ -151,27 +150,4 @@ lab.experiment('hapi-auth-email hashing', () => {
       done();
     });
   });
-  // currently not passing:
-  // lab.test('update', (done) => {
-  //   server.route({
-  //     path: '/api/sites/{site}/pages/{slug}',
-  //     method: 'PUT',
-  //     handler: (request, reply) => {
-  //       code.expect(request.headers).to.include('user-agent');
-  //       code.expect(request.headers).to.include('x-api-key');
-  //       code.expect(request.payload).to.include('content');
-  //       code.expect(request.params.tag).to.equal('myTag2');
-  //       code.expect(request.params.slug).to.equal('my-slug');
-  //       reply({ payload: { hello: 'world' } });
-  //     }
-  //   });
-  //   const pageData = new PageData(url, key, userAgent);
-  //   pageData.update('mySite', { content: 'myContent', slug: 'my-slug' }, (err, result) => {
-  //     if (err) {
-  //       throw err;
-  //     }
-  //     code.expect(result.payload.hello).to.equal('world');
-  //     done();
-  //   });
-  // });
 });
