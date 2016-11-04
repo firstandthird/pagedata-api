@@ -3,17 +3,15 @@
 const wreck = require('wreck');
 const async = require('async');
 const defaults = require('lodash.defaultsdeep');
+const version = require('./package.json').version;
 
 class PageData {
   constructor(url, key, userAgent) {
     this.options = {
       url,
-      key
+      key,
+      userAgent: userAgent ? userAgent : `pagedata-api/${version}`
     };
-    // userAgent is optional
-    if (userAgent) {
-      this.options.userAgent = userAgent;
-    }
   }
   getPages(site, done) {
     const url = `${this.options.url}/api/sites/${site}/pages`;

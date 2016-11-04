@@ -131,11 +131,13 @@ lab.experiment('hapi-auth-email hashing', () => {
   });
 
   lab.test('userAgent is optional', (done) => {
+    const defaultUserAgent = `pagedata-api/${require('../package.json').version}`;
     server.route({
       path: '/api/sites/{site}/pages',
       method: 'GET',
       handler: (request, reply) => {
-        code.expect(request.headers).to.not.include('user-agent');
+        code.expect(request.headers).to.include('user-agent');
+        code.expect(request.headers['user-agent']).to.equal(defaultUserAgent);
         code.expect(request.headers).to.include('x-api-key');
         code.expect(request.headers['x-api-key']).to.equal(key);
         reply({ hello: 'world' });
