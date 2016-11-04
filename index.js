@@ -10,17 +10,22 @@ class PageData {
       url,
       key
     };
+    // userAgent is optional
     if (userAgent) {
       this.options.userAgent = userAgent;
     }
   }
   getPages(site, done) {
     const url = `${this.options.url}/api/sites/${site}/pages`;
+    const headers = {
+      'x-api-key': this.options.key
+    };
+    if (this.options.userAgent) {
+      headers['user-agent'] = this.options.userAgent;
+    }
     wreck.get(url, {
       json: true,
-      headers: {
-        'x-api-key': this.options.key
-      }
+      headers,
     }, (err, res, payload) => {
       if (err) {
         return done(err);
@@ -39,11 +44,15 @@ class PageData {
       tag = '';
     }
     const url = this.getUrl(site, slug, tag);
+    const headers = {
+      'x-api-key': this.options.key
+    };
+    if (this.options.userAgent) {
+      headers['user-agent'] = this.options.userAgent;
+    }
     wreck.get(url, {
       json: true,
-      headers: {
-        'x-api-key': this.options.key
-      }
+      headers,
     }, (err, res, payload) => {
       if (err) {
         return cb(err);
@@ -90,13 +99,14 @@ class PageData {
     const headers = {
       'x-api-key': this.options.key
     };
+    if (this.options.userAgent) {
+      headers['user-agent'] = this.options.userAgent;
+    }
 
     if (!content.content) {
       return cb({ message: 'Payload must include content attirbute' });
     }
-
     const payload = JSON.stringify(content);
-
     wreck.put(url, {
       json: true,
       headers,

@@ -4,7 +4,7 @@
   "description": "An API module for gathering page data.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "lab tests"
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,11 @@
     "wreck": "^7.0.2"
   },
   "devDependencies": {
+    "code": "^4.0.0",
     "eslint": "^3.4.0",
     "eslint-config-firstandthird": "^3.0.2",
-    "eslint-plugin-import": "^1.14.0"
+    "eslint-plugin-import": "^1.14.0",
+    "hapi": "^15.2.0",
+    "lab": "^11.1.0"
   }
 }
