@@ -3,22 +3,27 @@
 const wreck = require('wreck');
 const async = require('async');
 const defaults = require('lodash.defaultsdeep');
+const version = require('./package.json').version;
 
 class PageData {
-  constructor(url, key) {
+  constructor(url, key, userAgent) {
     this.options = {
       url,
-      key
+      key,
+      userAgent: userAgent ? userAgent : `pagedata-api/${version}`
     };
   }
-
   getPages(site, done) {
     const url = `${this.options.url}/api/sites/${site}/pages`;
+    const headers = {
+      'x-api-key': this.options.key
+    };
+    if (this.options.userAgent) {
+      headers['user-agent'] = this.options.userAgent;
+    }
     wreck.get(url, {
       json: true,
-      headers: {
-        'x-api-key': this.options.key
-      }
+      headers,
     }, (err, res, payload) => {
       if (err) {
         return done(err);
@@ -37,11 +42,15 @@ class PageData {
       tag = '';
     }
     const url = this.getUrl(site, slug, tag);
+    const headers = {
+      'x-api-key': this.options.key
+    };
+    if (this.options.userAgent) {
+      headers['user-agent'] = this.options.userAgent;
+    }
     wreck.get(url, {
       json: true,
-      headers: {
-        'x-api-key': this.options.key
-      }
+      headers,
     }, (err, res, payload) => {
       if (err) {
         return cb(err);
@@ -83,33 +92,6 @@ class PageData {
     });
   }
 
-  update(slug, content, cb) {
-    const url = this.getUrl(slug);
-    const headers = {
-      'x-api-key': this.options.key
-    };
-
-    if (!content.content) {
-      return cb({ message: 'Payload must include content attirbute' });
-    }
-
-    const payload = JSON.stringify(content);
-
-    wreck.put(url, {
-      json: true,
-      headers,
-      payload
-    }, (err, res, responsePayload) => {
-      if (err) {
-        return cb(err);
-      }
-      if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, result: res });
-      }
-
-      cb(null, responsePayload);
-    });
-  }
 }
 
 module.exports = PageData;
