@@ -1,4 +1,11 @@
 
+0.5.0 / 2016-12-02
+==================
+
+  * default user-agent is pagedata-api/${version}
+  * removed outdated update method
+  * added userAgent
+
 0.4.0 / 2016-10-20
 ==================
 
