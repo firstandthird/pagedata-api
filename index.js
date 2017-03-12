@@ -10,7 +10,7 @@ class PageData {
     this.options = {
       url,
       key,
-      userAgent: userAgent ? userAgent : `pagedata-api/${version}`
+      userAgent: userAgent || `pagedata-api/${version}`
     };
   }
   getPages(site, done) {
