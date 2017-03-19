@@ -1,3 +1,4 @@
+/*
 'use strict';
 const code = require('code');   // assertion library
 const Lab = require('lab');
@@ -153,3 +154,4 @@ lab.experiment('hapi-auth-email hashing', () => {
     });
   });
 });
+*/

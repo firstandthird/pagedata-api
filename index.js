@@ -1,20 +1,19 @@
 'use strict';
 
 const wreck = require('wreck');
-const async = require('async');
-const defaults = require('lodash.defaultsdeep');
 const version = require('./package.json').version;
 
 class PageData {
-  constructor(url, key, userAgent) {
+  constructor(host, key, userAgent) {
     this.options = {
-      url,
+      host,
       key,
       userAgent: userAgent || `pagedata-api/${version}`
     };
   }
-  getPages(site, done) {
-    const url = `${this.options.url}/api/sites/${site}/pages`;
+
+  get(endpoint, done) {
+    const url = `${this.options.host}${endpoint}`;
     const headers = {
       'x-api-key': this.options.key
     };
@@ -28,70 +27,47 @@ class PageData {
       if (err) {
         return done(err);
       }
+      if (res.statusCode === 404) {
+        return done(new Error('Not found'));
+      }
+      if (res.statusCode !== 200) {
+        return done({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
+      }
       done(null, payload);
     });
   }
 
-  getUrl(site, slug, tag) {
-    return `${this.options.url}/api/sites/${site}/pages/${slug}?tag=${tag}`;
+  getSites(done) {
+    this.get('/api/sites', done);
   }
 
-  get(site, slug, tag, cb) {
+  getCollectionsBySite(siteId, done) {
+    this.get(`/api/collections?site=${siteId}`, done);
+  }
+
+  getCollectionsBySiteSlug(siteSlug, done) {
+    this.get(`/api/collections?siteSlug=${siteSlug}`, done);
+  }
+
+  getCollection(collectionId, done) {
+    this.get(`/api/collections/${collectionId}`, done);
+  }
+
+  getPages(siteSlug, collection, done) {
+    if (typeof collection === 'function') {
+      done = collection;
+      collection = '';
+    }
+    this.get(`/api/sites/${siteSlug}/pages?${collection ? `collection=${collection}` : ''}`, done);
+  }
+
+  getPage(slug, tag, done) {
     if (typeof tag === 'function') {
-      cb = tag;
+      done = tag;
       tag = '';
     }
-    const url = this.getUrl(site, slug, tag);
-    const headers = {
-      'x-api-key': this.options.key
-    };
-    if (this.options.userAgent) {
-      headers['user-agent'] = this.options.userAgent;
-    }
-    wreck.get(url, {
-      json: true,
-      headers,
-    }, (err, res, payload) => {
-      if (err) {
-        return cb(err);
-      }
-      if (res.statusCode === 404) {
-        return cb(new Error('Invalid slug and/or tag'));
-      }
-      if (res.statusCode !== 200) {
-        return cb({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
-      }
-      if (typeof payload.content === 'string') {
-        try {
-          payload.content = JSON.parse(payload.content);
-        } catch (e) {
-          return cb(e);
-        }
-      }
-      return cb(null, payload);
-    });
+    this.get(`/api/pages/${slug}?tag=${tag}`, done);
   }
-
-  getMany(site, slugs, tag, cb) {
-    async.map(slugs, (slug, done) => {
-      this.get(site, slug, tag, done);
-    }, cb);
-  }
-
-  getManyAndMerge(site, slugs, tag, cb) {
-    async.map(slugs, (slug, done) => {
-      this.get(site, slug, tag, done);
-    }, (err, data) => {
-      if (err) {
-        return cb(err);
-      }
-      const content = data.map(item => item.content);
-      content.unshift({});
-      const merged = defaults.apply(null, content);
-      cb(null, merged);
-    });
-  }
-
 }
 
 module.exports = PageData;

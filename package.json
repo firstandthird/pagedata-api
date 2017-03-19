@@ -17,9 +17,7 @@
   },
   "homepage": "https://github.com/firstandthird/pagedata-api#readme",
   "dependencies": {
-    "async": "^1.5.2",
-    "lodash.defaultsdeep": "^4.4.0",
-    "wreck": "^7.0.2"
+    "lodash.defaultsdeep": "^4.4.0"
   },
   "devDependencies": {
     "code": "^4.0.0",
