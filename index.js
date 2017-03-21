@@ -61,6 +61,14 @@ class PageData {
     this.get(`/api/sites/${siteSlug}/pages?${collection ? `collection=${collection}` : ''}`, done);
   }
 
+  getPagesWithContent(siteSlug, collection, done) {
+    if (typeof collection === 'function') {
+      done = collection;
+      collection = '';
+    }
+    this.get(`/api/sites/${siteSlug}/pages?includeContent=true&${collection ? `collection=${collection}` : ''}`, done);
+  }
+
   getPage(slug, tag, done) {
     if (typeof tag === 'function') {
       done = tag;
