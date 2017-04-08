@@ -22,20 +22,24 @@ class PageData {
       headers['user-agent'] = this.options.userAgent;
     }
     wreck.request(method, url, {
-      json: true,
       payload: data ? JSON.stringify(data) : undefined,
       headers,
-    }, (err, res, payload) => {
+    }, (err, res) => {
       if (err) {
         return done(err);
       }
       if (res.statusCode === 404) {
         return done(new Error('Not found'));
       }
-      if (res.statusCode !== 200) {
-        return done({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
-      }
-      done(null, payload);
+      wreck.read(res, { json: true }, (readErr, payload) => {
+        if (readErr) {
+          return done(readErr);
+        }
+        if (res.statusCode !== 200) {
+          return done({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
+        }
+        done(null, payload);
+      });
     });
   }
 
