@@ -2,6 +2,7 @@
 
 const wreck = require('wreck');
 const version = require('./package.json').version;
+const querystring = require('querystring');
 
 class PageData {
   constructor(host, key, userAgent) {
@@ -12,7 +13,7 @@ class PageData {
     };
   }
 
-  get(endpoint, done) {
+  request(method, endpoint, data, done) {
     const url = `${this.options.host}${endpoint}`;
     const headers = {
       'x-api-key': this.options.key
@@ -20,8 +21,9 @@ class PageData {
     if (this.options.userAgent) {
       headers['user-agent'] = this.options.userAgent;
     }
-    wreck.get(url, {
+    wreck.request(method, url, {
       json: true,
+      payload: data ? JSON.stringify(data) : undefined,
       headers,
     }, (err, res, payload) => {
       if (err) {
@@ -37,12 +39,29 @@ class PageData {
     });
   }
 
+  get(endpoint, done) {
+    this.request('get', endpoint, null, done);
+  }
+
+  post(endpoint, data, done) {
+    this.request('post', endpoint, data, done);
+  }
+
+  put(endpoint, data, done) {
+    this.request('put', endpoint, data, done);
+  }
+
   getSites(done) {
     this.get('/api/sites', done);
   }
 
-  getCollectionsBySite(siteId, done) {
-    this.get(`/api/collections?site=${siteId}`, done);
+  getCollections(query, done) {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
+    }
+    const qs = querystring.stringify(query);
+    this.get(`/api/collections?${qs}`, done);
   }
 
   getCollectionsBySiteSlug(siteSlug, done) {
@@ -53,20 +72,13 @@ class PageData {
     this.get(`/api/collections/${collectionId}`, done);
   }
 
-  getPages(siteSlug, collection, done) {
-    if (typeof collection === 'function') {
-      done = collection;
-      collection = '';
+  getPages(query, done) {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
     }
-    this.get(`/api/sites/${siteSlug}/pages?${collection ? `collection=${collection}` : ''}`, done);
-  }
-
-  getPagesWithContent(siteSlug, collection, done) {
-    if (typeof collection === 'function') {
-      done = collection;
-      collection = '';
-    }
-    this.get(`/api/sites/${siteSlug}/pages?includeContent=true&${collection ? `collection=${collection}` : ''}`, done);
+    const qs = querystring.stringify(query);
+    this.get(`/api/pages?${qs}`, done);
   }
 
   getPage(slug, tag, done) {
@@ -75,6 +87,14 @@ class PageData {
       tag = '';
     }
     this.get(`/api/pages/${slug}?tag=${tag}`, done);
+  }
+
+  createPage(data, done) {
+    this.post('/api/pages', data, done);
+  }
+
+  updatePage(slug, data, done) {
+    this.put(`/api/pages/${slug}`, data, done);
   }
 }
 
