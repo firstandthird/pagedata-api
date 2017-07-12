@@ -3,6 +3,7 @@
 const wreck = require('wreck');
 const version = require('./package.json').version;
 const querystring = require('querystring');
+const Boom = require('boom');
 
 class PageData {
   constructor(host, key, userAgent) {
@@ -29,14 +30,11 @@ class PageData {
         return done(err);
       }
       if (res.statusCode === 404) {
-        return done(new Error('Not found'));
+        return done(Boom.notFound());
       }
       wreck.read(res, { json: true }, (readErr, payload) => {
         if (readErr) {
-          return done(readErr);
-        }
-        if (res.statusCode !== 200) {
-          return done({ message: 'Api returned a non 200 status code', statusCode: res.statusCode, payload });
+          return done(Boom.wrap(readErr, res.statusCode));
         }
         done(null, payload);
       });
