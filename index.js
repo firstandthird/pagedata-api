@@ -57,23 +57,6 @@ class PageData {
     this.get('/api/sites', done);
   }
 
-  getCollections(query, done) {
-    if (typeof query === 'function') {
-      done = query;
-      query = {};
-    }
-    const qs = querystring.stringify(query);
-    this.get(`/api/collections?${qs}`, done);
-  }
-
-  getCollectionsBySiteSlug(siteSlug, done) {
-    this.get(`/api/collections?siteSlug=${siteSlug}`, done);
-  }
-
-  getCollection(collectionId, done) {
-    this.get(`/api/collections/${collectionId}`, done);
-  }
-
   getPages(query, done) {
     if (typeof query === 'function') {
       done = query;
