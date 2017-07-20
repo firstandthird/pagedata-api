@@ -53,8 +53,8 @@ class PageData {
     this.request('put', endpoint, data, done);
   }
 
-  getSites(done) {
-    this.get('/api/sites', done);
+  getProjects(done) {
+    this.get('/api/projects', done);
   }
 
   getPages(query, done) {
@@ -66,20 +66,13 @@ class PageData {
     this.get(`/api/pages?${qs}`, done);
   }
 
-  getPage(slug, tag, done) {
-    if (typeof tag === 'function') {
-      done = tag;
-      tag = '';
+  getPage(slug, query, done) {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
     }
-    this.get(`/api/pages/${slug}?tag=${tag}`, done);
-  }
-
-  createPage(data, done) {
-    this.post('/api/pages', data, done);
-  }
-
-  updatePage(slug, data, done) {
-    this.put(`/api/pages/${slug}`, data, done);
+    const qs = querystring.stringify(query);
+    this.get(`/api/pages/${slug}?${qs}`, done);
   }
 }
 
