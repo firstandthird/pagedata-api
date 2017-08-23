@@ -32,6 +32,15 @@ class PageData {
       if (res.statusCode === 404) {
         return done(Boom.notFound());
       }
+      if (res.statusCode === 401) {
+        return done(Boom.unauthorized());
+      }
+
+      // General status code catch
+      if (res.statusCode !== 200) {
+        return done(Boom.badReqeust('An Error Occured', { statusCode: res.statusCode })); 
+      }
+
       wreck.read(res, { json: true }, (readErr, payload) => {
         if (readErr) {
           return done(Boom.wrap(readErr, res.statusCode));
