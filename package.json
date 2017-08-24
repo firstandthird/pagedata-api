@@ -19,7 +19,7 @@
   "dependencies": {
     "boom": "^5.1.0",
     "lodash.defaultsdeep": "^4.4.0",
-    "wreck": "^12.2.2"
+    "wreck": "^12.2.3"
   },
   "devDependencies": {
     "code": "^4.0.0",

@@ -26,19 +26,13 @@ class PageData {
       payload: data ? JSON.stringify(data) : undefined,
       headers,
     }, (err, res) => {
-      if (err) {
-        return done(err);
-      }
-      if (res.statusCode === 404) {
-        return done(Boom.notFound());
-      }
-      if (res.statusCode === 401) {
-        return done(Boom.unauthorized());
+      
+      if (!err && res.statusCode >= 400) {
+        err = Boom.create(res.statusCode);
       }
 
-      // General status code catch
-      if (res.statusCode !== 200) {
-        return done(Boom.badReqeust('An Error Occured', { statusCode: res.statusCode })); 
+      if (err) {
+        return done(err);
       }
 
       wreck.read(res, { json: true }, (readErr, payload) => {
