@@ -14,7 +14,7 @@ class PageData {
     };
   }
 
-  request(method, endpoint, data, done) {
+  async request(method, endpoint, data) {
     const url = `${this.options.host}${endpoint}`;
     const headers = {
       'x-api-key': this.options.key
@@ -22,57 +22,50 @@ class PageData {
     if (this.options.userAgent) {
       headers['user-agent'] = this.options.userAgent;
     }
-    wreck.request(method, url, {
-      payload: data ? JSON.stringify(data) : undefined,
-      headers,
-    }, (err, res) => {
-      if (err) {
-        return done(err);
-      }
-      if (res.statusCode === 404) {
-        return done(Boom.notFound());
-      }
-      wreck.read(res, { json: true }, (readErr, payload) => {
-        if (readErr) {
-          return done(Boom.wrap(readErr, res.statusCode));
-        }
-        done(null, payload);
+    try {
+      const res = await wreck.request(method, url, {
+        payload: data ? JSON.stringify(data) : undefined,
+        headers,
       });
-    });
+      if (res.statusCode === 404) {
+        return Boom.notFound();
+      }
+      return await wreck.read(res, { json: true });
+    } catch (e) {
+      throw e;
+    }
   }
 
-  get(endpoint, done) {
-    this.request('get', endpoint, null, done);
+  async get(endpoint) {
+    return await this.request('get', endpoint, null);
   }
 
-  post(endpoint, data, done) {
-    this.request('post', endpoint, data, done);
+  async post(endpoint, data) {
+    return await this.request('post', endpoint, data);
   }
 
-  put(endpoint, data, done) {
-    this.request('put', endpoint, data, done);
+  async put(endpoint, data) {
+    return await this.request('put', endpoint, data);
   }
 
-  getProjects(done) {
-    this.get('/api/projects', done);
+  async getProjects() {
+    return await this.get('/api/projects');
   }
 
-  getPages(query, done) {
-    if (typeof query === 'function') {
-      done = query;
+  async getPages(query) {
+    if (!query) {
       query = {};
     }
     const qs = querystring.stringify(query);
-    this.get(`/api/pages?${qs}`, done);
+    return await this.get(`/api/pages?${qs}`);
   }
 
-  getPage(slug, query, done) {
-    if (typeof query === 'function') {
-      done = query;
+  async getPage(slug, query) {
+    if (!query) {
       query = {};
     }
     const qs = querystring.stringify(query);
-    this.get(`/api/pages/${slug}?${qs}`, done);
+    return await this.get(`/api/pages/${slug}?${qs}`);
   }
 }
 

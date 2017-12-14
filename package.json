@@ -17,16 +17,16 @@
   },
   "homepage": "https://github.com/firstandthird/pagedata-api#readme",
   "dependencies": {
-    "boom": "^5.1.0",
-    "lodash.defaultsdeep": "^4.4.0",
-    "wreck": "^12.2.2"
+    "aug": "^2.0.0",
+    "boom": "^7.1.1",
+    "wreck": "^14.0.2"
   },
   "devDependencies": {
-    "code": "^4.0.0",
-    "eslint": "^3.4.0",
-    "eslint-config-firstandthird": "^3.0.2",
-    "eslint-plugin-import": "^1.14.0",
-    "hapi": "^15.2.0",
-    "lab": "^11.1.0"
+    "code": "^5.1.2",
+    "eslint": "^4.13.1",
+    "eslint-config-firstandthird": "^4.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "hapi": "^17.1.1",
+    "lab": "^15.1.2"
   }
 }
