@@ -22,18 +22,14 @@ class PageData {
     if (this.options.userAgent) {
       headers['user-agent'] = this.options.userAgent;
     }
-    try {
-      const res = await wreck.request(method, url, {
-        payload: data ? JSON.stringify(data) : undefined,
-        headers,
-      });
-      if (res.statusCode === 404) {
-        return Boom.notFound();
-      }
-      return await wreck.read(res, { json: true });
-    } catch (e) {
-      throw e;
+    const res = await wreck.request(method, url, {
+      payload: data ? JSON.stringify(data) : undefined,
+      headers,
+    });
+    if (res.statusCode === 404) {
+      throw Boom.notFound();
     }
+    return wreck.read(res, { json: true });
   }
 
   async get(endpoint) {
