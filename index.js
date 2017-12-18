@@ -6,11 +6,12 @@ const querystring = require('querystring');
 const Boom = require('boom');
 
 class PageData {
-  constructor(host, key, userAgent) {
+  constructor(host, key, userAgent, timeout) {
     this.options = {
       host,
       key,
-      userAgent: userAgent || `pagedata-api/${version}`
+      userAgent: userAgent || `pagedata-api/${version}`,
+      timeout: timeout || 0
     };
   }
 
@@ -22,10 +23,16 @@ class PageData {
     if (this.options.userAgent) {
       headers['user-agent'] = this.options.userAgent;
     }
-    const res = await wreck.request(method, url, {
+    const reqOpts = {
       payload: data ? JSON.stringify(data) : undefined,
-      headers,
-    });
+      headers
+    };
+
+    if (this.options.timeout) {
+      reqOpts.timeout = this.options.timeout;
+    }
+    const res = await wreck.request(method, url, reqOpts);
+
     if (res.statusCode === 404) {
       throw Boom.notFound();
     }
