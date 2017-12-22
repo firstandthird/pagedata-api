@@ -1,5 +1,3 @@
-'use strict';
-
 const wreck = require('wreck');
 const version = require('./package.json').version;
 const querystring = require('querystring');
@@ -39,36 +37,36 @@ class PageData {
     return wreck.read(res, { json: true });
   }
 
-  async get(endpoint) {
-    return await this.request('get', endpoint, null);
+  get(endpoint) {
+    return this.request('get', endpoint, null);
   }
 
-  async post(endpoint, data) {
-    return await this.request('post', endpoint, data);
+  post(endpoint, data) {
+    return this.request('post', endpoint, data);
   }
 
-  async put(endpoint, data) {
-    return await this.request('put', endpoint, data);
+  put(endpoint, data) {
+    return this.request('put', endpoint, data);
   }
 
-  async getProjects() {
-    return await this.get('/api/projects');
+  getProjects() {
+    return this.get('/api/projects');
   }
 
-  async getPages(query) {
+  getPages(query) {
     if (!query) {
       query = {};
     }
     const qs = querystring.stringify(query);
-    return await this.get(`/api/pages?${qs}`);
+    return this.get(`/api/pages?${qs}`);
   }
 
-  async getPage(slug, query) {
+  getPage(slug, query) {
     if (!query) {
       query = {};
     }
     const qs = querystring.stringify(query);
-    return await this.get(`/api/pages/${slug}?${qs}`);
+    return this.get(`/api/pages/${slug}?${qs}`);
   }
 }
 
