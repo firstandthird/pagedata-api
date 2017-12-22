@@ -37,23 +37,23 @@ class PageData {
     return wreck.read(res, { json: true });
   }
 
-  async get(endpoint) {
+  get(endpoint) {
     return this.request('get', endpoint, null);
   }
 
-  async post(endpoint, data) {
+  post(endpoint, data) {
     return this.request('post', endpoint, data);
   }
 
-  async put(endpoint, data) {
+  put(endpoint, data) {
     return this.request('put', endpoint, data);
   }
 
-  async getProjects() {
+  getProjects() {
     return this.get('/api/projects');
   }
 
-  async getPages(query) {
+  getPages(query) {
     if (!query) {
       query = {};
     }
@@ -61,7 +61,7 @@ class PageData {
     return this.get(`/api/pages?${qs}`);
   }
 
-  async getPage(slug, query) {
+  getPage(slug, query) {
     if (!query) {
       query = {};
     }
