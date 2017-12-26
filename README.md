@@ -1,1 +1,1 @@
-## pagedata-api
+## pagedata-api [![Build Status](https://travis-ci.org/firstandthird/pagedata-api.svg?branch=master)](https://travis-ci.org/firstandthird/pagedata-api) [![Coverage Status](https://coveralls.io/repos/github/firstandthird/pagedata-api/badge.svg?branch=master)](https://coveralls.io/github/firstandthird/pagedata-api?branch=master)
