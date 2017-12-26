@@ -2,15 +2,17 @@ const wreck = require('wreck');
 const version = require('./package.json').version;
 const querystring = require('querystring');
 const Boom = require('boom');
+const joi = require('joi');
 
 class PageData {
-  constructor(host, key, userAgent, timeout) {
-    this.options = {
-      host,
-      key,
-      userAgent: userAgent || `pagedata-api/${version}`,
-      timeout: timeout || 0
-    };
+  constructor(options) {
+    this.options = joi.validate(options, {
+      host: joi.string(),
+      key: joi.string(),
+      userAgent: joi.string().default(`pagedata-api/${version}`),
+      timeout: joi.number().default(0),
+      status: joi.string().default('draft')
+    }).value;
   }
 
   async request(method, endpoint, data) {
@@ -57,6 +59,10 @@ class PageData {
     if (!query) {
       query = {};
     }
+    // add the default page status if not specified:
+    if (!query.status) {
+      query.status = this.options.status;
+    }
     const qs = querystring.stringify(query);
     return this.get(`/api/pages?${qs}`);
   }
@@ -64,6 +70,10 @@ class PageData {
   getPage(slug, query) {
     if (!query) {
       query = {};
+    }
+    // add the default page status if not specified:
+    if (!query.status) {
+      query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
     return this.get(`/api/pages/${slug}?${qs}`);
