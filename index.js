@@ -6,13 +6,17 @@ const joi = require('joi');
 
 class PageData {
   constructor(options) {
-    this.options = joi.validate(options, {
+    const validation = joi.validate(options, {
       host: joi.string(),
       key: joi.string(),
       userAgent: joi.string().default(`pagedata-api/${version}`),
       timeout: joi.number().default(0),
       status: joi.string().default('draft')
-    }).value;
+    });
+    if (validation.error) {
+      throw validation.error;
+    }
+    this.options = validation.value;
   }
 
   async request(method, endpoint, data) {

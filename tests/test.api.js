@@ -4,10 +4,16 @@ const Lab = require('lab');
 const lab = exports.lab = Lab.script();
 const Hapi = require('hapi');
 const PageData = require('../index.js');
-
 const host = 'http://localhost:8000';
 const key = 'theKey';
 const userAgent = '007';
+
+lab.test('will throw error if instantiated with invalid config', () => {
+  const f = () => {
+    const pagedata = new PageData({ blah: 'blarney' });
+  };
+  code.expect(f).to.throw();
+});
 
 lab.test('can instantiate the PageData API', async() => {
   const server = new Hapi.Server({ port: 8000 });
