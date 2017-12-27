@@ -1,6 +1,6 @@
 {
   "name": "pagedata",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "An API module for gathering page data.",
   "main": "index.js",
   "scripts": {
