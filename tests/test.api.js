@@ -7,6 +7,7 @@ const PageData = require('../index.js');
 const host = 'http://localhost:8000';
 const key = 'theKey';
 const userAgent = '007';
+const boom = require('boom');
 
 lab.test('will throw error if instantiated with invalid config', () => {
   const f = () => {
@@ -88,5 +89,68 @@ lab.test('constructor takes a default status', async() => {
   const pageData = new PageData({ host, key, userAgent, status: 'published' });
   const result = await pageData.getPages({ name: 'mySite' });
   code.expect(result.payload.hello).to.equal('world');
+  await server.stop();
+});
+
+lab.test('support retries on 502, 503 and 504 errors', { timeout: 5000 }, async() => {
+  const server = new Hapi.Server({ port: 8000 });
+  await server.start();
+  const counts = {
+    e502: false,
+    e503: false,
+    e504: false
+  };
+  server.route({
+    path: '/api/502',
+    method: 'GET',
+    handler: (request, h) => {
+      if (!counts.e502) {
+        counts.e502 = true;
+        throw boom.badGateway('a 502 error');
+      }
+      return { payload: { hello: 'world' } };
+    }
+  });
+  server.route({
+    path: '/api/503',
+    method: 'GET',
+    handler: (request, h) => {
+      if (!counts.e503) {
+        counts.e503 = true;
+        throw boom.serverUnavailable('a 503 error');
+      }
+      return { payload: { hello: 'world2' } };
+    }
+  });
+  server.route({
+    path: '/api/504',
+    method: 'GET',
+    handler: (request, h) => {
+      if (!counts.e504) {
+        counts.e504 = true;
+        throw boom.gatewayTimeout('a 504 error');
+      }
+      return { payload: { hello: 'world3' } };
+    }
+  });
+  server.route({
+    path: '/api/broke',
+    method: 'GET',
+    handler: (request, h) => {
+      throw boom.gatewayTimeout('a 504 error');
+    }
+  });
+  const pageData = new PageData({ host, key, userAgent, retryOnGet: 1 });
+  let result = await pageData.get('/api/502');
+  code.expect(result.payload.hello).to.equal('world');
+  code.expect(counts.e502).to.equal(true);
+  result = await pageData.get('/api/503');
+  code.expect(result.payload.hello).to.equal('world2');
+  code.expect(counts.e503).to.equal(true);
+  result = await pageData.get('/api/504');
+  code.expect(result.payload.hello).to.equal('world3');
+  code.expect(counts.e504).to.equal(true);
+  result = await pageData.get('/api/broke');
+  code.expect(result.statusCode).to.equal(504);
   await server.stop();
 });
