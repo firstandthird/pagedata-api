@@ -11,7 +11,8 @@ class PageData {
       key: joi.string(),
       userAgent: joi.string().default(`pagedata-api/${version}`),
       timeout: joi.number().default(0),
-      status: joi.string().default('draft')
+      status: joi.string().default('draft'),
+      retryOnGet: joi.number().default(0)
     });
     if (validation.error) {
       throw validation.error;
@@ -44,7 +45,18 @@ class PageData {
   }
 
   get(endpoint) {
-    return this.request('get', endpoint, null);
+    const callIt = async(count = 0) => {
+      const response = await this.request('get', endpoint, null);
+      // retry up to n times if it is a 502/503/504 response:
+      if ([502, 503, 504].includes(response.statusCode)) {
+        if (count >= this.options.retryOnGet) {
+          return response;
+        }
+        return callIt(count + 1);
+      }
+      return response;
+    };
+    return callIt();
   }
 
   post(endpoint, data) {
