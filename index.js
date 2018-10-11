@@ -50,6 +50,9 @@ class PageData {
       // retry up to n times if it is a 502/503/504 response:
       if ([502, 503, 504].includes(response.statusCode)) {
         if (count >= this.options.retryOnGet) {
+          if ([502, 503, 504].includes(response.statusCode)) {
+            throw new Boom('There was an error', { statusCode: response.statusCode });
+          }
           return response;
         }
         return callIt(count + 1);

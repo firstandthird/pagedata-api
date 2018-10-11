@@ -11,7 +11,7 @@ const boom = require('boom');
 
 lab.test('will throw error if instantiated with invalid config', () => {
   const f = () => {
-    const pagedata = new PageData({ blah: 'blarney' });
+    new PageData({ blah: 'blarney' });
   };
   code.expect(f).to.throw();
 });
@@ -150,7 +150,32 @@ lab.test('support retries on 502, 503 and 504 errors', { timeout: 5000 }, async(
   result = await pageData.get('/api/504');
   code.expect(result.payload.hello).to.equal('world3');
   code.expect(counts.e504).to.equal(true);
-  result = await pageData.get('/api/broke');
-  code.expect(result.statusCode).to.equal(504);
+  try {
+    result = await pageData.get('/api/broke');
+  } catch (e) {
+    code.expect(e.output.statusCode).to.equal(504);
+  }
   await server.stop();
 });
+
+lab.test('failed retries passes back original error', { timeout: 5000 }, async() => {
+  const server = new Hapi.Server({ port: 8000 });
+  await server.start();
+  server.route({
+    path: '/api/502',
+    method: 'GET',
+    handler: (request, h) => {
+      throw boom.badGateway('a 502 error');
+    }
+  });
+  const pageData = new PageData({ host, key, userAgent, retryOnGet: 1 });
+  try {
+    await pageData.get('/api/502');
+  } catch (e) {
+    code.expect(e).exists();
+    code.expect(e.isBoom).to.be.true();
+    code.expect(e.output.statusCode).to.equal(502);
+  }
+  await server.stop();
+});
+
