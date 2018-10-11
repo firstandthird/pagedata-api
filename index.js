@@ -37,17 +37,26 @@ class PageData {
       reqOpts.timeout = this.options.timeout;
     }
     const res = await wreck.request(method, url, reqOpts);
+    let respPayload;
+    try {
+      respPayload = wreck.read(res, { json: true });
+    } catch (err) {
+      err.data = err.data || {};
+      err.data.res = res;
+      throw err;
+    }
 
     if (res.statusCode >= 400) {
       const errData = {
         isResponseError: true,
         headers: res.headers,
         res,
-        url
+        url,
+        payload: respPayload
       };
       throw new Boom(`Response Error: ${res.statusCode} ${res.statusMessage}`, { statusCode: res.statusCode, data: errData });
     }
-    return wreck.read(res, { json: true });
+    return respPayload;
   }
 
   get(endpoint) {
