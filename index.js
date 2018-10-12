@@ -37,23 +37,40 @@ class PageData {
       reqOpts.timeout = this.options.timeout;
     }
     const res = await wreck.request(method, url, reqOpts);
-
-    if (res.statusCode === 404) {
-      throw Boom.notFound();
+    let respPayload;
+    try {
+      respPayload = wreck.read(res, { json: true });
+    } catch (err) {
+      err.data = err.data || {};
+      err.data.res = res;
+      throw err;
     }
-    return wreck.read(res, { json: true });
+
+    if (res.statusCode >= 400) {
+      const errData = {
+        isResponseError: true,
+        headers: res.headers,
+        res,
+        url,
+        payload: respPayload
+      };
+      throw new Boom(`Response Error: ${res.statusCode} ${res.statusMessage}`, { statusCode: res.statusCode, data: errData });
+    }
+    return respPayload;
   }
 
   get(endpoint) {
     const callIt = async(count = 0) => {
-      const response = await this.request('get', endpoint, null);
-      // retry up to n times if it is a 502/503/504 response:
-      if ([502, 503, 504].includes(response.statusCode)) {
-        if (count >= this.options.retryOnGet) {
-          return response;
+      let response;
+      try {
+        response = await this.request('get', endpoint, null);
+      } catch (e) {
+        if (count < this.options.retryOnGet) {
+          return callIt(count + 1);
         }
-        return callIt(count + 1);
+        throw e;
       }
+
       return response;
     };
     return callIt();
