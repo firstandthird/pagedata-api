@@ -50,7 +50,6 @@ class PageData {
       const errData = {
         isResponseError: true,
         headers: res.headers,
-        res,
         url,
         payload: respPayload
       };
