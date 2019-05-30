@@ -55,6 +55,21 @@ lab.test('getPages', async() => {
   await server.stop();
 });
 
+lab.test('getMultiplePages', async() => {
+  const server = new Hapi.Server({ port: 8000 });
+  await server.start();
+  server.route({
+    path: '/api/pages/{slug}',
+    method: 'get',
+    handler: (request, h) => ({ content: request.params.slug })
+  });
+  const pageData = new PageData({ host, key, userAgent });
+  const result = await pageData.getMultiplePages(['slug1', 'slug2'], { findIt: 2 });
+  code.expect(result.slug1.content).to.equal('slug1');
+  code.expect(result.slug2.content).to.equal('slug2');
+  await server.stop();
+});
+
 lab.test('get', async() => {
   const server = new Hapi.Server({ port: 8000 });
   await server.start();
@@ -178,4 +193,3 @@ lab.test('failed retries passes back original error', { timeout: 5000 }, async()
   }
   await server.stop();
 });
-

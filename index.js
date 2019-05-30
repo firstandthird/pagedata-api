@@ -3,6 +3,7 @@ const version = require('./package.json').version;
 const querystring = require('querystring');
 const Boom = require('boom');
 const joi = require('joi');
+const pprops = require('p-props');
 
 class PageData {
   constructor(options) {
@@ -97,6 +98,18 @@ class PageData {
     }
     const qs = querystring.stringify(query);
     return this.get(`/api/pages?${qs}`);
+  }
+
+  getMultiplePages(slugs, query = {}) {
+    // add the default page status if not specified:
+    if (!query.status) {
+      query.status = this.options.status;
+    }
+    const qs = querystring.stringify(query);
+    return pprops(slugs.reduce((memo, slug) => {
+      memo[slug] = this.get(`/api/pages/${slug}?${qs}`);
+      return memo;
+    }, {}));
   }
 
   getPage(slug, query) {
