@@ -61,12 +61,26 @@ lab.test('getMultiplePages', async() => {
   server.route({
     path: '/api/pages/{slug}',
     method: 'get',
-    handler: (request, h) => ({ content: request.params.slug })
+    handler: (request, h) => ({
+      content: {
+        common: { test: 123 },
+        page1: {
+          headline: `${request.params.slug}-page1`
+        },
+        slug: request.params.slug
+      },
+    })
   });
   const pageData = new PageData({ host, key, userAgent });
   const result = await pageData.getMultiplePages(['slug1', 'slug2'], { findIt: 2 });
-  code.expect(result.slug1.content).to.equal('slug1');
-  code.expect(result.slug2.content).to.equal('slug2');
+  code.expect(result.slug1.content.slug).to.equal('slug1');
+  code.expect(result.slug2.content.slug).to.equal('slug2');
+  // with mapping:
+  const pages = await pageData.getMultiplePages(['slug1', 'slug2'], {}, { common: 'common', content: 'page1' });
+  code.expect(pages.slug1.common.test, 123);
+  code.expect(pages.slug1.content.headline, 'slug1-page1');
+  code.expect(pages.slug2.common.test, 123);
+  code.expect(pages.slug2.content.headline, 'slug2-page1');
   await server.stop();
 });
 
