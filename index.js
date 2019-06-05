@@ -107,7 +107,7 @@ class PageData {
     }
     const qs = querystring.stringify(query);
     const obj = await pprops(slugs.reduce((memo, slug) => {
-      memo[slug] =  this.get(`/api/pages/${slug}?${qs}`);
+      memo[slug] = this.get(`/api/pages/${slug}?${qs}`);
       return memo;
     }, {}));
     if (!map) {
