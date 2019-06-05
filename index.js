@@ -100,28 +100,24 @@ class PageData {
     return this.get(`/api/pages?${qs}`);
   }
 
-  getMultiplePages(slugs, query = {}, map = false) {
+  async getMultiplePages(slugs, query = {}, map = false) {
     // add the default page status if not specified:
     if (!query.status) {
       query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
-    return pprops(slugs.reduce((memo, slug) => {
-      memo[slug] = new Promise(async resolve => {
-        const page = await this.get(`/api/pages/${slug}?${qs}`);
-        // if no mapping then just return the entire page:
-        if (!map) {
-          return resolve(page);
-        }
-        // use mapping to extract specific data from the page contents:
-        const obj = {};
-        Object.keys(map).forEach(mapKey => {
-          obj[mapKey] = page.content[map[mapKey]];
-        });
-        return resolve(obj);
-      });
+    const obj = await pprops(slugs.reduce((memo, slug) => {
+      memo[slug] =  this.get(`/api/pages/${slug}?${qs}`);
       return memo;
     }, {}));
+    if (!map) {
+      return obj;
+    }
+    const mapped = {};
+    Object.keys(map).forEach(mapKey => {
+      mapped[mapKey] = obj[map[mapKey]];
+    });
+    return mapped;
   }
 
   getPage(slug, query) {
