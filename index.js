@@ -100,16 +100,24 @@ class PageData {
     return this.get(`/api/pages?${qs}`);
   }
 
-  getMultiplePages(slugs, query = {}) {
+  async getMultiplePages(slugs, query = {}, map = false) {
     // add the default page status if not specified:
     if (!query.status) {
       query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
-    return pprops(slugs.reduce((memo, slug) => {
+    const obj = await pprops(slugs.reduce((memo, slug) => {
       memo[slug] = this.get(`/api/pages/${slug}?${qs}`);
       return memo;
     }, {}));
+    if (!map) {
+      return obj;
+    }
+    const mapped = {};
+    Object.keys(map).forEach(mapKey => {
+      mapped[mapKey] = obj[map[mapKey]].content;
+    });
+    return mapped;
   }
 
   getPage(slug, query) {
