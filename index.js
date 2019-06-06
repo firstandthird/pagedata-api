@@ -115,7 +115,7 @@ class PageData {
     }
     const mapped = {};
     Object.keys(map).forEach(mapKey => {
-      mapped[mapKey] = obj[map[mapKey]];
+      mapped[mapKey] = obj[map[mapKey]].content;
     });
     return mapped;
   }

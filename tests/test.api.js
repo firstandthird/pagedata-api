@@ -78,8 +78,8 @@ lab.test('getMultiplePages', async() => {
   code.expect(result.slug2.content.slug).to.equal('slug2');
   // with mapping:
   const pages = await pageData.getMultiplePages(['sgff-common', 'sgff-page1'], {}, { common: 'sgff-common', content: 'sgff-page1' });
-  code.expect(pages.common.test, 123);
-  code.expect(pages.content.headline, 'this is a headline');
+  code.expect(pages.common.test).to.equal(123);
+  code.expect(pages.content.headline).to.equal('this is a headline');
   await server.stop();
 });
 
