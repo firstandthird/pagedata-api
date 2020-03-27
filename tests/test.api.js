@@ -23,7 +23,7 @@ lab.test('can instantiate the PageData API', async() => {
   code.expect(typeof pageData).to.equal('object');
   code.expect(typeof pageData.getPages).to.equal('function');
   code.expect(typeof pageData.getPage).to.equal('function');
-  code.expect(typeof pageData.getProjects).to.equal('function');
+  code.expect(typeof pageData.getFolders).to.equal('function');
   code.expect(typeof pageData.get).to.equal('function');
   code.expect(typeof pageData.post).to.equal('function');
   code.expect(typeof pageData.put).to.equal('function');
@@ -38,19 +38,20 @@ lab.test('getPages', async() => {
   const server = new Hapi.Server({ port: 8000 });
   await server.start();
   server.route({
-    path: '/api/pages',
+    path: '/api/pages/{folder}',
     method: 'get',
     handler: (request, h) => {
       code.expect(request.headers).to.include('user-agent');
       code.expect(request.headers['user-agent']).to.equal(userAgent);
-      code.expect(request.headers).to.include('x-api-key');
-      code.expect(request.headers['x-api-key']).to.equal(key);
+      code.expect(request.headers).to.include('x-api-token');
+      code.expect(request.headers['x-api-token']).to.equal(key);
       code.expect(request.query.status).to.equal('draft');
+      code.expect(request.params.folder).to.equal('f1');
       return { hello: 'world' };
     }
   });
   const pageData = new PageData({ host, key, userAgent });
-  const result = await pageData.getPages({ name: 'mySite' });
+  const result = await pageData.getPages('f1', { name: 'mySite' });
   code.expect(result.hello).to.equal('world');
   await server.stop();
 });
@@ -59,7 +60,7 @@ lab.test('getMultiplePages', async() => {
   const server = new Hapi.Server({ port: 8000 });
   await server.start();
   server.route({
-    path: '/api/pages/{slug}',
+    path: '/api/pages/{folder}/{slug}',
     method: 'get',
     handler: (request, h) => {
       if (request.params.slug === 'sgff-common') {
@@ -72,12 +73,16 @@ lab.test('getMultiplePages', async() => {
     }
   });
   const pageData = new PageData({ host, key, userAgent });
-  const result = await pageData.getMultiplePages(['slug1', 'slug2'], { findIt: 2 });
+  const result = await pageData.getMultiplePages([
+    { folder: 'f1', slug: 'slug1' },
+    { folder: 'f2', slug: 'slug2' }], { findIt: 2 });
   code.expect(result.slug1.content.slug).to.equal('slug1');
   code.expect(result.slug1.content.query.findIt).to.equal('2');
   code.expect(result.slug2.content.slug).to.equal('slug2');
   // with mapping:
-  const pages = await pageData.getMultiplePages(['sgff-common', 'sgff-page1'], {}, { common: 'sgff-common', content: 'sgff-page1' });
+  const pages = await pageData.getMultiplePages([
+    { folder: 'f1', slug: 'sgff-common' },
+    { folder: 'f2', slug: 'sgff-page1' }], {}, { common: 'sgff-common', content: 'sgff-page1' });
   code.expect(pages.common.test).to.equal(123);
   code.expect(pages.content.headline).to.equal('this is a headline');
   await server.stop();
@@ -87,16 +92,16 @@ lab.test('get', async() => {
   const server = new Hapi.Server({ port: 8000 });
   await server.start();
   server.route({
-    path: '/api/pages',
+    path: '/api/f1/pages',
     method: 'GET',
     handler: (request, h) => {
       code.expect(request.headers).to.include('user-agent');
-      code.expect(request.headers).to.include('x-api-key');
+      code.expect(request.headers).to.include('x-api-token');
       return { payload: { hello: 'world' } };
     }
   });
   const pageData = new PageData({ host, key, userAgent });
-  const result = await pageData.get('/api/pages');
+  const result = await pageData.get('/api/f1/pages');
   code.expect(result.payload.hello).to.equal('world');
   await server.stop();
 });
@@ -105,17 +110,18 @@ lab.test('constructor takes a default status', async() => {
   const server = new Hapi.Server({ port: 8000 });
   await server.start();
   server.route({
-    path: '/api/pages',
+    path: '/api/pages/{folder}',
     method: 'GET',
     handler: (request, h) => {
       code.expect(request.headers).to.include('user-agent');
-      code.expect(request.headers).to.include('x-api-key');
+      code.expect(request.headers).to.include('x-api-token');
       code.expect(request.query.status).to.equal('published');
+      code.expect(request.params.folder).to.equal('f1');
       return { payload: { hello: 'world' } };
     }
   });
   const pageData = new PageData({ host, key, userAgent, status: 'published' });
-  const result = await pageData.getPages({ name: 'mySite' });
+  const result = await pageData.getPages('f1', { name: 'mySite' });
   code.expect(result.payload.hello).to.equal('world');
   await server.stop();
 });
