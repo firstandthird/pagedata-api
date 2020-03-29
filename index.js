@@ -24,7 +24,7 @@ class PageData {
   async request(method, endpoint, data) {
     const url = `${this.options.host}${endpoint}`;
     const headers = {
-      'x-api-key': this.options.key
+      'x-api-token': this.options.key
     };
     if (this.options.userAgent) {
       headers['user-agent'] = this.options.userAgent;
@@ -84,11 +84,11 @@ class PageData {
     return this.request('put', endpoint, data);
   }
 
-  getProjects() {
-    return this.get('/api/projects');
+  getFolders() {
+    return this.get('/api/folders');
   }
 
-  getPages(query) {
+  getPages(folder, query) {
     if (!query) {
       query = {};
     }
@@ -97,17 +97,17 @@ class PageData {
       query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
-    return this.get(`/api/pages?${qs}`);
+    return this.get(`/api/pages/${folder}?${qs}`);
   }
 
-  async getMultiplePages(slugs, query = {}, map = false) {
+  async getMultiplePages(pages, query = {}, map = false) {
     // add the default page status if not specified:
     if (!query.status) {
       query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
-    const obj = await pprops(slugs.reduce((memo, slug) => {
-      memo[slug] = this.get(`/api/pages/${slug}?${qs}`);
+    const obj = await pprops(pages.reduce((memo, page) => {
+      memo[page.slug] = this.get(`/api/pages/${page.folder}/${page.slug}?${qs}`);
       return memo;
     }, {}));
     if (!map) {
@@ -120,7 +120,7 @@ class PageData {
     return mapped;
   }
 
-  getPage(slug, query) {
+  getPage(folder, slug, query) {
     if (!query) {
       query = {};
     }
@@ -129,7 +129,7 @@ class PageData {
       query.status = this.options.status;
     }
     const qs = querystring.stringify(query);
-    return this.get(`/api/pages/${slug}?${qs}`);
+    return this.get(`/api/pages/${folder}/${slug}?${qs}`);
   }
 }
 
